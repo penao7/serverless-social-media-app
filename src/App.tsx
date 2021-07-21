@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import { v4 as uuidv4 } from 'uuid';
 interface Item {
   name: string,
-  price: string,
+  price: string
+}
+
+interface Payload extends Item {
   id: string
 }
 
 const App: React.FC = () => {
 
   const [payload, setPayload] = useState<Item>({
-    id: '',
     name: '',
     price: ''
   });
 
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<Payload[]>([]);
 
   const API_URL = process.env.REACT_APP_API_URL;
 
@@ -25,13 +27,11 @@ const App: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const item: Item = {
-      id: payload?.id,
+    const item: Payload = {
+      id: uuidv4(),
       name: payload?.name,
       price: payload?.price
     };
-
-    console.log('item', item);
 
     try {
       axios.put(
@@ -67,14 +67,6 @@ const App: React.FC = () => {
   return (
     <div>
       <form onSubmit={(e) => handleSubmit(e)}>
-        <label>ID:</label>
-        <input
-          type="text"
-          name="id"
-          onChange={handleChange}
-          value={payload.id}
-        />
-
         <label>Name:</label>
         <input
           type="text"
