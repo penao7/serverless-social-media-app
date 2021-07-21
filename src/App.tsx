@@ -9,6 +9,9 @@ interface Item {
 interface Payload extends Item {
   id: string
 }
+interface Items {
+  Items: Payload[]
+}
 
 const App: React.FC = () => {
 
@@ -44,10 +47,9 @@ const App: React.FC = () => {
     }
   };
 
-
   const getItems = async () => {
     try {
-      const { data } = await axios.get(`${API_URL}`);
+      const { data } = await axios.get<Items>(`${API_URL}`);
       setItems(data.Items);
     } catch (err) {
       console.log('err', err);
