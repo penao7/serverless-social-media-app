@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 interface Item {
-  name: string,
-  price: string,
   image?: File
 }
 
-interface Payload extends Item {
+interface Payload {
+  url: string,
+  key: string,
   id: string
 }
 interface Items {
@@ -15,14 +15,13 @@ interface Items {
 }
 
 interface SignUrl {
-  fileUploadURL: string
+  fileUploadURL: string,
+  Key: string
 }
 
 const App: React.FC = () => {
 
   const [payload, setPayload] = useState<Item>({
-    name: '',
-    price: '',
     image: undefined
   });
 
@@ -30,19 +29,14 @@ const App: React.FC = () => {
 
   const API_URL = process.env.REACT_APP_API_URL;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPayload({ ...payload, [e.target.name]: e.target.value });
-  };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    console.log(file);
     setPayload({ ...payload, [e.target.name]: file });
   };
 
   // react dropzone
 
-  const uploadFile = async (): Promise<AxiosResponse | { error: string }> => {
+  const uploadFile = async () => {
     // When the upload file button is clicked,
     // first we need to get the presigned URL
     // URL is the one you get from AWS API Gateway
@@ -54,11 +48,14 @@ const App: React.FC = () => {
       const url = data.fileUploadURL;
 
       // Initiating the PUT request to upload file
-      return axios.put(url, payload.image, {
+      const { config } = await axios.put(url, payload.image, {
         headers: {
           headers: { 'Content-Type': 'multipart/form-data' }
         }
       });
+
+      return config.data.name;
+
     } catch (err) {
       console.log('uploadFileErr: ', err);
       return { error: 'Error uploading file' };
@@ -67,64 +64,62 @@ const App: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    uploadFile();
-    /* const item: Payload = {
-      id: uuidv4(),
-      name: payload?.name,
-      price: payload?.price,
-      image: payload?.image
-    };
-
+    const bucketUrl = process.env.REACT_APP_BUCKET_URL;
+    const imageUrl = `${bucketUrl}/${payload.image?.name}`;
     try {
+      const imageKey = await uploadFile();
+      const item: Payload = {
+        id: uuidv4(),
+        url: imageUrl,
+        key: imageKey
+      };
+
       const data = await axios.put(
-        `${API_URL}`,
+        `${API_URL}/items`,
         item
       );
-      console.log('data', data);
+      console.log(data.data);
       setItems([...items, item]);
     } catch (err) {
-      console.log('err', err);
-    } */
+      console.log('submit error', err);
+    }
   };
 
   const getItems = async () => {
     try {
-      const { data } = await axios.get<Items>(`${API_URL}`);
+      const { data } = await axios.get<Items>(`${API_URL}/items`);
       setItems(data.Items);
     } catch (err) {
-      console.log('err', err);
+      console.log('get items error', err);
+    }
+  };
+
+  const deletePhoto = async (key: string) => {
+    try {
+      await axios.delete(`${API_URL}/photos/${key}`);
+    } catch (err) {
+      console.log('delete photo error', err);
     }
   };
 
   const deleteItem = async (id: string) => {
     try {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/${id}`);
+      await axios.delete(`${API_URL}/items/${id}`);
       const filteredList = items.filter(item => item.id.toLocaleLowerCase().trim() !== id.toLocaleLowerCase().trim());
       setItems(filteredList);
     } catch (err) {
-      console.log('err', err);
+      console.log('delete item error', err);
     }
+  };
+
+  const deletePost = async (id: string, key: string) => {
+    await deletePhoto(key);
+    await deleteItem(id);
   };
 
   return (
     <div>
       <form onSubmit={(e) => handleSubmit(e)}>
-        <label>Name:</label>
-        <input
-          type="text"
-          name="name"
-          onChange={handleChange}
-          value={payload.name}
-        />
-
-        <label>Price:</label>
-        <input
-          type="text"
-          name="price"
-          onChange={handleChange}
-          value={payload.price}
-        />
-
         <label>Image:</label>
         <input
           type="file"
@@ -140,9 +135,9 @@ const App: React.FC = () => {
           {items && items.map(item => (
             <tr key={item.id}>
               <td>{item.id}</td>
-              <td>{item.name}</td>
-              <td>{item.price}</td>
-              <td><button onClick={() => deleteItem(item.id)}>delete</button></td>
+              <td>{item.key}</td>
+              <td><img src={`${item.url}`} style={{ height: 250, width: 250 }} /></td>
+              <td><button onClick={() => deletePost(item.id, item.key)}>delete</button></td>
             </tr>
           ))}
         </tbody>
