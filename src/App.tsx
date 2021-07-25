@@ -74,11 +74,6 @@ const App: React.FC = () => {
         key: imageKey
       };
 
-      const data = await axios.put(
-        `${API_URL}/items`,
-        item
-      );
-      console.log(data.data);
       setItems([...items, item]);
     } catch (err) {
       console.log('submit error', err);
@@ -88,6 +83,7 @@ const App: React.FC = () => {
   const getItems = async () => {
     try {
       const { data } = await axios.get<Items>(`${API_URL}/items`);
+      console.log('itemdata', data);
       setItems(data.Items);
     } catch (err) {
       console.log('get items error', err);
@@ -132,14 +128,14 @@ const App: React.FC = () => {
       <button onClick={getItems}>Get items</button>
       <table>
         <tbody>
-          {items && items.map(item => (
+          {items && items.map(item =>
             <tr key={item.id}>
               <td>{item.id}</td>
               <td>{item.key}</td>
-              <td><img src={`${item.url}`} style={{ height: 250, width: 250 }} /></td>
+              <td><img src={`http://${item.url}`} style={{ height: 250, width: 250 }} /></td>
               <td><button onClick={() => deletePost(item.id, item.key)}>delete</button></td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
