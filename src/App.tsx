@@ -1,23 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-interface Item {
-  image?: File
-}
-
-interface Payload {
-  url: string,
-  key: string,
-  id: string
-}
-interface Items {
-  Items: Payload[]
-}
-
-interface SignUrl {
-  fileUploadURL: string,
-  Key: string
-}
+import './app.scss';
+import { SignUrl, Item, Items, Payload } from './Types';
+import PostList from './Posts/PostList';
+import mockItems from './util/mockItems';
 
 const App: React.FC = () => {
 
@@ -29,12 +16,16 @@ const App: React.FC = () => {
 
   const API_URL = process.env.REACT_APP_API_URL;
 
+  useEffect(() => {
+    setItems(mockItems);
+  }, []);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     setPayload({ ...payload, [e.target.name]: file });
   };
 
-  // react dropzone
+  // react dropzone for drag & drop
 
   const uploadFile = async () => {
     // When the upload file button is clicked,
@@ -42,7 +33,7 @@ const App: React.FC = () => {
     // URL is the one you get from AWS API Gateway
 
     try {
-      const { data } = await axios.get<SignUrl>(`${API_URL}/photos/initiate-upload?fileName=${payload?.image?.name}`);
+      const { data } = await axios.get<SignUrl>(`${API_URL}/photos/initialPhotoUpload?fileName=${payload?.image?.name}`);
 
       // Getting the url from response
       const url = data.fileUploadURL;
@@ -74,6 +65,11 @@ const App: React.FC = () => {
         key: imageKey
       };
 
+      const data = await axios.put(
+        `${API_URL}/posts`,
+        item
+      );
+      console.log(data.data);
       setItems([...items, item]);
     } catch (err) {
       console.log('submit error', err);
@@ -82,7 +78,7 @@ const App: React.FC = () => {
 
   const getItems = async () => {
     try {
-      const { data } = await axios.get<Items>(`${API_URL}/items`);
+      const { data } = await axios.get<Items>(`${API_URL}/posts`);
       console.log('itemdata', data);
       setItems(data.Items);
     } catch (err) {
@@ -90,55 +86,25 @@ const App: React.FC = () => {
     }
   };
 
-  const deletePhoto = async (key: string) => {
-    try {
-      await axios.delete(`${API_URL}/photos/${key}`);
-    } catch (err) {
-      console.log('delete photo error', err);
-    }
-  };
-
-  const deleteItem = async (id: string) => {
-    try {
-      await axios.delete(`${API_URL}/items/${id}`);
-      const filteredList = items.filter(item => item.id.toLocaleLowerCase().trim() !== id.toLocaleLowerCase().trim());
-      setItems(filteredList);
-    } catch (err) {
-      console.log('delete item error', err);
-    }
-  };
-
-  const deletePost = async (id: string, key: string) => {
-    await deletePhoto(key);
-    await deleteItem(id);
-  };
-
   return (
-    <div>
-      <form onSubmit={(e) => handleSubmit(e)}>
-        <label>Image:</label>
-        <input
-          type="file"
-          name="image"
-          onChange={handleFileChange}
-        />
-
-        <button type="submit">Send</button>
-      </form>
-      <button onClick={getItems}>Get items</button>
-      <table>
-        <tbody>
-          {items && items.map(item =>
-            <tr key={item.id}>
-              <td>{item.id}</td>
-              <td>{item.key}</td>
-              <td><img src={`http://${item.url}`} style={{ height: 250, width: 250 }} /></td>
-              <td><button onClick={() => deletePost(item.id, item.key)}>delete</button></td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+    <div className='grid-container'>
+      <div className='grid left'>
+        <form onSubmit={handleSubmit}>
+          <input
+            type='file'
+            name='image'
+            onChange={handleFileChange}
+          />
+          <button type="submit">submit</button>
+        </form>
+      </div>
+      <div className='grid middle'>
+        <PostList items={items} setItems={setItems} />
+      </div>
+      <div className='grid right'>
+        <button onClick={getItems}>get items</button>
+      </div>
+    </div >
   );
 };
 
