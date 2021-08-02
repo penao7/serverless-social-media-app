@@ -16,6 +16,16 @@ const App: React.FC = () => {
 
   const API_URL = process.env.REACT_APP_API_URL;
 
+  const handleLike = (id: string) => {
+    const newArray = items.map((item: Payload) => {
+      if (item.id === id && item.likes) {
+        item.likes++;
+      }
+      return item;
+    });
+    setItems(newArray);
+  };
+
   useEffect(() => {
     setItems(mockItems);
   }, []);
@@ -60,6 +70,9 @@ const App: React.FC = () => {
     try {
       const imageKey = await uploadFile();
       const item: Payload = {
+        likes: 0,
+        user: 'username',
+        comments: [],
         id: uuidv4(),
         url: imageUrl,
         key: imageKey
@@ -86,6 +99,29 @@ const App: React.FC = () => {
     }
   };
 
+  const deletePhoto = async (key: string) => {
+    try {
+      await axios.delete(`${API_URL}/photos/${key}`);
+    } catch (err) {
+      console.log('delete photo error', err);
+    }
+  };
+
+  const deleteItem = async (id: string) => {
+    try {
+      await axios.delete(`${API_URL}/posts/${id}`);
+      const filteredList = items.filter((item: Payload) => item.id.toLocaleLowerCase().trim() !== id.toLocaleLowerCase().trim());
+      setItems(filteredList);
+    } catch (err) {
+      console.log('delete item error', err);
+    }
+  };
+
+  const deletePost = async (id: string, key: string) => {
+    await deletePhoto(key);
+    await deleteItem(id);
+  };
+
   return (
     <div className='grid-container'>
       <div className='grid left'>
@@ -99,7 +135,7 @@ const App: React.FC = () => {
         </form>
       </div>
       <div className='grid middle'>
-        <PostList items={items} setItems={setItems} />
+        <PostList handleLike={handleLike} deletePost={deletePost} items={items} />
       </div>
       <div className='grid right'>
         <button onClick={getItems}>get items</button>

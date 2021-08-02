@@ -19,7 +19,7 @@ export const mockItems = [
       {
         id: 'comment3',
         user: 'user3',
-        message: 'this is a little bit longer text!'
+        message: 'this is a little bit longer text! djsajdsja jdsa jdsja jdsaj dsajdj sajd saj'
       },
     ]
   },

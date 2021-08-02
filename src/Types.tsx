@@ -11,9 +11,9 @@ export interface Comment {
 }
 
 export interface Payload {
-  likes?: number,
-  comments?: Comment[],
-  user?: string,
+  likes: number,
+  comments: Comment[],
+  user: string,
   url: string,
   key: string,
   id: string
