@@ -7,9 +7,8 @@ import PostList from './Posts/PostList';
 import mockItems from './util/mockItems';
 
 const App: React.FC = () => {
-
   const [payload, setPayload] = useState<Item>({
-    image: undefined
+    image: undefined,
   });
 
   const [items, setItems] = useState<Payload[]>([]);
@@ -43,7 +42,9 @@ const App: React.FC = () => {
     // URL is the one you get from AWS API Gateway
 
     try {
-      const { data } = await axios.get<SignUrl>(`${API_URL}/photos/initialPhotoUpload?fileName=${payload?.image?.name}`);
+      const { data } = await axios.get<SignUrl>(
+        `${API_URL}/photos/initialPhotoUpload?fileName=${payload?.image?.name}`
+      );
 
       // Getting the url from response
       const url = data.fileUploadURL;
@@ -51,12 +52,11 @@ const App: React.FC = () => {
       // Initiating the PUT request to upload file
       const { config } = await axios.put(url, payload.image, {
         headers: {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        }
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
       });
 
       return config.data.name;
-
     } catch (err) {
       console.log('uploadFileErr: ', err);
       return { error: 'Error uploading file' };
@@ -75,13 +75,10 @@ const App: React.FC = () => {
         comments: [],
         id: uuidv4(),
         url: imageUrl,
-        key: imageKey
+        key: imageKey,
       };
 
-      const data = await axios.put(
-        `${API_URL}/posts`,
-        item
-      );
+      const data = await axios.put(`${API_URL}/posts`, item);
       console.log(data.data);
       setItems([...items, item]);
     } catch (err) {
@@ -110,7 +107,10 @@ const App: React.FC = () => {
   const deleteItem = async (id: string) => {
     try {
       await axios.delete(`${API_URL}/posts/${id}`);
-      const filteredList = items.filter((item: Payload) => item.id.toLocaleLowerCase().trim() !== id.toLocaleLowerCase().trim());
+      const filteredList = items.filter(
+        (item: Payload) =>
+          item.id.toLocaleLowerCase().trim() !== id.toLocaleLowerCase().trim()
+      );
       setItems(filteredList);
     } catch (err) {
       console.log('delete item error', err);
@@ -123,24 +123,24 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className='grid-container'>
-      <div className='grid left'>
+    <div className="grid-container">
+      <div className="grid left">
         <form onSubmit={handleSubmit}>
-          <input
-            type='file'
-            name='image'
-            onChange={handleFileChange}
-          />
+          <input type="file" name="image" onChange={handleFileChange} />
           <button type="submit">submit</button>
         </form>
       </div>
-      <div className='grid middle'>
-        <PostList handleLike={handleLike} deletePost={deletePost} items={items} />
+      <div className="grid middle">
+        <PostList
+          handleLike={handleLike}
+          deletePost={deletePost}
+          items={items}
+        />
       </div>
-      <div className='grid right'>
+      <div className="grid right">
         <button onClick={getItems}>get items</button>
       </div>
-    </div >
+    </div>
   );
 };
 

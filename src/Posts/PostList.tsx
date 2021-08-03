@@ -8,12 +8,20 @@ type Props = {
   deletePost: (id: string, key: string) => void;
 };
 
-const PostList: React.FC<Props> = ({ items, handleLike, deletePost }: Props) => {
-
+const PostList: React.FC<Props> = ({
+  items,
+  handleLike,
+  deletePost,
+}: Props) => {
   return (
     <>
       {items.map((item: Payload) => (
-        <Post item={item} handleLike={handleLike} deletePost={deletePost} key={item.key} />
+        <Post
+          item={item}
+          handleLike={handleLike}
+          deletePost={deletePost}
+          key={item.key}
+        />
       ))}
     </>
   );

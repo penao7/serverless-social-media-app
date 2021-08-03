@@ -5,6 +5,7 @@ import PostStats from './PostStats';
 import PostImage from './PostImage';
 import PostHeader from './PostHeader';
 import PostFooter from './PostFooter';
+import './post.scss';
 
 interface Props {
   item: Payload;
@@ -13,7 +14,6 @@ interface Props {
 }
 
 const Post: React.FC<Props> = ({ item, handleLike, deletePost }: Props) => {
-
   const [showComments, setShowComments] = useState<boolean>(false);
 
   const handleOpenComments = () => {
@@ -21,14 +21,22 @@ const Post: React.FC<Props> = ({ item, handleLike, deletePost }: Props) => {
   };
 
   return (
-    <div key={item.id} className='post'>
-      <PostHeader user={item.user} id={item.id} postKey={item.key} deletePost={deletePost} />
+    <div key={item.id} className="post">
+      <PostHeader
+        user={item.user}
+        id={item.id}
+        postKey={item.key}
+        deletePost={deletePost}
+      />
       <PostImage url={item.url} />
       <PostStats likes={item.likes} commentsTotal={item.comments.length} />
       {showComments && <CommentBox comments={item.comments} />}
-      <PostFooter handleLike={handleLike} commentsVisible={showComments} showComments={handleOpenComments} id={item.id} />
+      <PostFooter
+        handleLike={handleLike}
+        showComments={handleOpenComments}
+        id={item.id}
+      />
     </div>
-
   );
 };
 

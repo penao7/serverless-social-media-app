@@ -1,19 +1,25 @@
 import React from 'react';
+import './post.scss';
 
 interface PostFooterProps {
   id: string;
   showComments: () => void;
   handleLike: (id: string) => void;
-  commentsVisible: boolean;
 }
 
-const PostFooter: React.FC<PostFooterProps> = ({ id, showComments, handleLike, commentsVisible }: PostFooterProps) => {
+const PostFooter: React.FC<PostFooterProps> = ({
+  id,
+  showComments,
+  handleLike
+}: PostFooterProps) => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginBottom: '4px', marginTop: commentsVisible ? 4 : 0 }}>
-      <div style={{ marginRight: 10 }}>
+    <div
+      className='postFooter'
+    >
+      <div className='likeButton'>
         <button onClick={() => handleLike(id)}>LIKE</button>
       </div>
-      <div>
+      <div className='commentsButton'>
         <button onClick={showComments}>COMMENTS</button>
       </div>
     </div>

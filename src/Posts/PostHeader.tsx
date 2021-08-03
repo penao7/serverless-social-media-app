@@ -1,4 +1,5 @@
 import React from 'react';
+import './post.scss';
 
 interface PostHeaderProps {
   user: string;
@@ -7,11 +8,20 @@ interface PostHeaderProps {
   deletePost: (id: string, key: string) => void;
 }
 
-const PostHeader: React.FC<PostHeaderProps> = ({ user, id, postKey, deletePost }: PostHeaderProps) => {
+const PostHeader: React.FC<PostHeaderProps> = ({
+  user,
+  id,
+  postKey,
+  deletePost,
+}: PostHeaderProps) => {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1vh' }}>
+    <div
+      className='postHeader'
+    >
       {user}
-      <button style={{ fontSize: 10 }} onClick={() => deletePost(id, postKey)}>X</button>
+      <button className='deletePost' onClick={() => deletePost(id, postKey)}>
+        X
+      </button>
     </div>
   );
 };

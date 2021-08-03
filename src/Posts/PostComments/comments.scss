@@ -1,0 +1,14 @@
+.commentBoxContainer {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+
+  .commentBox {
+    border: 1px solid black;
+  }
+}
+
+.commentUser {
+  font-weight: 600;
+}
+

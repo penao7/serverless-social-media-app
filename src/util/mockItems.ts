@@ -9,19 +9,20 @@ export const mockItems = [
       {
         id: 'comment1',
         user: 'user2',
-        message: 'nice!'
+        message: 'nice!',
       },
       {
         id: 'comment2',
         user: 'user2',
-        message: 'lol!'
+        message: 'lol!',
       },
       {
         id: 'comment3',
         user: 'user3',
-        message: 'this is a little bit longer text! djsajdsja jdsa jdsja jdsaj dsajdj sajd saj'
+        message:
+          'this is a little bit longer text! djsajdsja jdsa jdsja jdsaj dsajdj sajd saj',
       },
-    ]
+    ],
   },
   {
     user: 'user2',
@@ -33,9 +34,9 @@ export const mockItems = [
       {
         id: 'comment9',
         user: 'user2',
-        message: 'terve!'
+        message: 'terve!',
       },
-    ]
+    ],
   },
   {
     user: 'user3',
@@ -47,10 +48,10 @@ export const mockItems = [
       {
         id: 'comment1',
         user: 'user1',
-        message: 'huomenta!'
+        message: 'huomenta!',
       },
-    ]
-  }
+    ],
+  },
 ];
 
 export default mockItems;
